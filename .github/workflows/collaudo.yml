@@ -33,7 +33,7 @@ jobs:
     steps:
       # SHA verificato nel riferimento ufficiale actions/checkout v6.
       - name: Scarica i sorgenti
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       # SHA verificato nel riferimento ufficiale actions/setup-python v6.
@@ -85,7 +85,7 @@ jobs:
       PYTHONUTF8: "1"
     steps:
       - name: Scarica i sorgenti
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepara Python 3.12
@@ -115,7 +115,7 @@ jobs:
       PYTHONUTF8: "1"
     steps:
       - name: Scarica i sorgenti
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepara Python 3.12
