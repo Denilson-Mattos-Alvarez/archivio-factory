@@ -24,14 +24,14 @@ MP4 = b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2" + b"video-sintetico-wo
 class WorkflowBackendTests(TestCase):
     def setUp(self):
         cache.clear()
-        # Il cleanup ricorsivo del TemporaryDirectory resta dentro al runtime del progetto.
+        # La radice runtime è configurabile anche fuori dal checkout (ad esempio
+        # runner.temp in CI). Ogni test possiede soltanto questa nuova sottocartella.
         scratch = Path(settings.RUNTIME_ROOT).resolve()
-        self.assertTrue(scratch.is_relative_to(Path(settings.BASE_DIR).resolve()))
         scratch.mkdir(parents=True, exist_ok=True)
         self.tmp = tempfile.TemporaryDirectory(prefix="test-workflow-", dir=scratch)
+        self.addCleanup(self.tmp.cleanup)
         self.override = override_settings(PRIVATE_MEDIA_ROOT=Path(self.tmp.name))
         self.override.enable()
-        self.addCleanup(self.tmp.cleanup)
         self.addCleanup(self.override.disable)
         User = get_user_model()
         self.a = User.objects.create_user("revisore_workflow_a", password="password-sintetica")
