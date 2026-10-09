@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Accedi · Archivio Factory{% endblock %}
+{% block content %}
+<div class="login-shell">
+  <a class="brand login-brand" href="{% url 'login' %}"><span class="brand-mark">A</span><span class="brand-name">Archivio<span>Factory</span></span></a>
+  <section class="login-story">
+    <p class="eyebrow">Il tuo archivio editoriale</p>
+    <h1>Ogni video.<br>Ogni versione.<br><em>Un solo posto.</em></h1>
+    <p>Conserva le produzioni di Kaapi e della Factory, rivedi il copione e prepara le prossime uscite.</p>
+    <div class="login-flow"><span>Conserva</span><svg class="icon"><use href="#i-chevron"/></svg><span>Rivedi</span><svg class="icon"><use href="#i-chevron"/></svg><span>Approva</span><svg class="icon"><use href="#i-chevron"/></svg><span>Programma</span></div>
+  </section>
+  <section class="login-card" aria-labelledby="login-title">
+    <h2 id="login-title">Bentornato.</h2>
+    <p class="login-description">Accedi al tuo spazio privato.</p>
+    {% if form.errors %}<div class="form-errors" role="alert">Nome utente o password non corretti. Controlla i dati e riprova.</div>{% endif %}
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="field"><label for="id_username">Nome utente</label><input id="id_username" name="username" type="text" value="{{ form.username.value|default_if_none:'' }}" autocomplete="username" autocapitalize="none" required autofocus></div>
+      <div class="field"><label for="id_password">Password</label><input id="id_password" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn btn-primary btn-full" type="submit">Entra nell’archivio<svg class="icon"><use href="#i-arrow"/></svg></button>
+    </form>
+    <p class="login-private"><svg class="icon"><use href="#i-lock"/></svg>Accesso riservato alle persone autorizzate</p>
+  </section>
+</div>
+{% endblock %}

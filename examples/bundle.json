@@ -1,0 +1,9 @@
+{
+  "titolo": "Episodio di esempio",
+  "origine": "kaapi",
+  "riferimento_factory": "kaapi:episodio-esempio-001",
+  "video": "video.mp4",
+  "copione": "copione.txt",
+  "nota": "Prima versione da rivedere",
+  "allegati": ["episode.it.json"]
+}

@@ -1,0 +1,69 @@
+{% load static %}
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}Archivio Factory{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'archivio/app.css' %}">
+  <script src="{% static 'archivio/app.js' %}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenuto">Vai al contenuto</a>
+  <svg class="svg-symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 5h13M8 12h13M8 19h13M3 5h.01M3 12h.01M3 19h.01"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M7 14h2M13 14h2M7 18h2"/></symbol>
+    <symbol id="i-requests" viewBox="0 0 24 24"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9l4 2v-4"/><path d="M7 9h10M7 13h6M18 12v7M15 16l3 3 3-3"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 .6c0 1.8-2.5 1.9-2.5 3.7M12 17h.01"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3M7 8l5-5 5 5M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4m-11-5 4 2-4 2z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v6h5M8 13h8M8 17h5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7V5a1 1 0 0 1 1-1h5l2 3h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></symbol>
+  </svg>
+  {% if request.user.is_authenticated %}
+  <header class="mobile-header">
+    <a class="brand" href="{% url 'archivio:lista' %}"><span class="brand-mark">A</span><span class="brand-name">Archivio Factory</span></a>
+    <button type="button" data-menu-toggle aria-controls="navigazione" aria-expanded="false" aria-label="Apri la navigazione"><svg class="icon"><use href="#i-menu"/></svg></button>
+  </header>
+  <div class="sidebar-scrim" data-sidebar-scrim hidden></div>
+  <aside class="sidebar" id="navigazione" data-sidebar>
+    <a class="brand" href="{% url 'archivio:lista' %}"><span class="brand-mark">A</span><span class="brand-name">Archivio<span>Factory</span></span></a>
+    <p class="sidebar-intro">Uno spazio per conservare,<br>rivedere e preparare le uscite.</p>
+    <p class="nav-label">Il tuo spazio</p>
+    <nav class="nav-links" aria-label="Navigazione principale">
+      <a class="nav-link {% if request.resolver_match.url_name == 'lista' or request.resolver_match.url_name == 'dettaglio' or request.resolver_match.url_name == 'nuova' or request.resolver_match.url_name == 'nuova_revisione' %}is-active{% endif %}" href="{% url 'archivio:lista' %}"><svg class="icon"><use href="#i-grid"/></svg>Archivio</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'calendario' %}is-active{% endif %}" href="{% url 'archivio:calendario' %}"><svg class="icon"><use href="#i-calendar"/></svg>Calendario</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'richieste' %}is-active{% endif %}" href="{% url 'archivio:richieste' %}"><svg class="icon"><use href="#i-requests"/></svg>Richieste</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'guida' %}is-active{% endif %}" href="{% url 'archivio:guida' %}"><svg class="icon"><use href="#i-help"/></svg>Come funziona</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="private-note"><svg class="icon"><use href="#i-lock"/></svg>Archivio privato</div>
+      <div class="user-menu">
+        <span class="avatar" aria-hidden="true">{{ request.user.username|first|upper }}</span>
+        <div><div class="user-name">{{ request.user.get_full_name|default:request.user.username }}</div><form class="logout" method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Esci dall’archivio</button></form></div>
+      </div>
+    </div>
+  </aside>
+  {% endif %}
+  <main id="contenuto" class="{% if request.user.is_authenticated %}app-main{% else %}auth-main{% endif %}">
+    {% if request.user.is_authenticated %}
+    <div class="topbar"><div class="topbar-path"><span>Factory</span><svg class="icon"><use href="#i-chevron"/></svg><strong>{% block breadcrumb %}Archivio{% endblock %}</strong></div><span class="topbar-tag">Produzioni e revisioni</span></div>
+    {% endif %}
+    {% if messages %}<div class="messages" role="status">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% block content %}{% endblock %}
+    {% if request.user.is_authenticated %}<footer class="site-footer"><span>Archivio Factory · Il lavoro di oggi, le versioni di domani.</span><a href="{% url 'archivio:guida' %}">Come funziona l’archivio</a></footer>{% endif %}
+  </main>
+</body>
+</html>

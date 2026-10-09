@@ -1,0 +1,132 @@
+name: Collaudo Archivio Factory
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: collaudo-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  collaudo:
+    name: Python 3.12 su ${{ matrix.sistema }}
+    runs-on: ${{ matrix.sistema }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        sistema: [ubuntu-latest, windows-latest]
+    env:
+      ARCHIVIO_AMBIENTE: sviluppo
+      ARCHIVIO_RUNTIME_ROOT: ${{ runner.temp }}/archivio-collaudo
+      ARCHIVIO_MEDIA_ROOT: ${{ runner.temp }}/archivio-collaudo/media
+      ARCHIVIO_TEST_TMP: ${{ runner.temp }}
+      DATABASE_URL: ""
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONUTF8: "1"
+    steps:
+      # SHA verificato nel riferimento ufficiale actions/checkout v6.
+      - name: Scarica i sorgenti
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      # SHA verificato nel riferimento ufficiale actions/setup-python v6.
+      - name: Prepara Python 3.12
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Installa le dipendenze runtime verificate
+        run: >-
+          python -m pip install --require-hashes --only-binary=:all: -r requirements-lock.txt
+      - name: Verifica la configurazione Django
+        run: python manage.py check
+      - name: Verifica che le migrazioni siano aggiornate
+        run: python manage.py makemigrations --check --dry-run
+      - name: Esegui il collaudo con dati sintetici
+        run: python manage.py test tests
+
+  collaudo-postgresql:
+    name: Python 3.12 con PostgreSQL 16 temporaneo
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        # Digest verificato sull'immagine PostgreSQL 16 già usata nel laboratorio.
+        image: postgres@sha256:5d143123fdf80462d1778cd4f24b9f7ca13c87174bca19141fb194c5a1ebca59
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: archivio_ci
+          # Credenziale fittizia, valida solo per il servizio temporaneo di questo job.
+          POSTGRES_PASSWORD: archivio-ci-admin-fittizio
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d archivio_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 6
+    env:
+      ARCHIVIO_AMBIENTE: sviluppo
+      ARCHIVIO_POSTGRES_CI: "1"
+      ARCHIVIO_CI_ADMIN_PASSWORD: archivio-ci-admin-fittizio
+      ARCHIVIO_CI_APP_PASSWORD: archivio-ci-app-fittizio
+      ARCHIVIO_SCHEMA: archivio_factory
+      ARCHIVIO_RUNTIME_ROOT: ${{ runner.temp }}/archivio-postgres-collaudo
+      ARCHIVIO_MEDIA_ROOT: ${{ runner.temp }}/archivio-postgres-collaudo/media
+      ARCHIVIO_TEST_TMP: ${{ runner.temp }}
+      DATABASE_URL: postgresql://archivio_app:archivio-ci-app-fittizio@localhost:5432/archivio_ci?sslmode=disable
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONUTF8: "1"
+    steps:
+      - name: Scarica i sorgenti
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Prepara Python 3.12
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Installa le dipendenze runtime verificate
+        run: >-
+          python -m pip install --require-hashes --only-binary=:all: -r requirements-lock.txt
+      - name: Prepara il ruolo applicativo e gli schemi privati della CI
+        run: python tests/prepara_postgres_ci.py
+      - name: Verifica la configurazione Django
+        run: python manage.py check
+      - name: Verifica che le migrazioni siano aggiornate
+        run: python manage.py makemigrations --check --dry-run
+      - name: Applica le migrazioni al solo database temporaneo
+        run: python manage.py migrate --noinput
+      - name: Esegui tutti i test senza accettare prove saltate
+        run: python manage.py test tests --testrunner tests.prepara_postgres_ci.CollaudoPostgresRunner --noinput
+
+  audit-dipendenze:
+    name: Controlla le vulnerabilità delle dipendenze runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONUTF8: "1"
+    steps:
+      - name: Scarica i sorgenti
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Prepara Python 3.12
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Installa lo strumento di audit separato
+        run: >-
+          python -m pip install --only-binary=:all: pip-audit==2.10.1
+      # Il file contiene gli otto pacchetti runtime, comprese le dipendenze
+      # transitive: l'ambiente dello strumento di audit non viene analizzato.
+      # Nessuna correzione automatica: vulnerabilità/errori fanno fallire il job.
+      - name: Analizza il file runtime bloccato
+        run: python -m pip_audit --strict --require-hashes --disable-pip --vulnerability-service pypi -r requirements-lock.txt

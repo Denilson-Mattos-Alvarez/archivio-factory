@@ -1,0 +1,22 @@
+{
+  "formato": "archivio-factory-job-v1",
+  "stato_ponte": "da_dispatcher",
+  "richiesta": {
+    "id": "00000000-0000-4000-8000-000000000001",
+    "revisione": "00000000-0000-4000-8000-000000000002",
+    "produzione": "00000000-0000-4000-8000-000000000003",
+    "target": "montaggio",
+    "testo": "Ridurre l'introduzione a cinque secondi.",
+    "stato": "in_attesa",
+    "origine": "kaapi",
+    "riferimento_factory": "kaapi:episodio-esempio-001"
+  },
+  "revisione": "00000000-0000-4000-8000-000000000002",
+  "produzione": "00000000-0000-4000-8000-000000000003",
+  "manifest_sha256": "HASH_SHA256_RESTITUITO_DALL_API",
+  "copione_sha256": "HASH_SHA256_VERIFICATO_DEL_COPIONE",
+  "metadati_sha256": "HASH_SHA256_DELLA_SNAPSHOT_REVISIONE_JSON",
+  "file": [],
+  "origine": "kaapi",
+  "riferimento_factory": "kaapi:episodio-esempio-001"
+}

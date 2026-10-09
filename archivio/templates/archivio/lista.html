@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Archivio · Archivio Factory{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">Tutte le tue produzioni</p><h1>Il tuo archivio.</h1><p class="page-description">Video di Kaapi e della Factory, con le revisioni sempre a portata di mano.</p></div>
+  {% if puo_creare %}<a class="btn btn-primary" href="{% url 'archivio:nuova' %}"><svg class="icon"><use href="#i-plus"/></svg>Nuova produzione</a>{% endif %}
+</div>
+<div class="archive-overview" aria-label="Stato delle produzioni">
+  <a class="overview-item {% if not stato %}is-active{% endif %}" href="{% url 'archivio:lista' %}"><span>Tutte le produzioni</span><strong>{{ conteggi.totale|default:0 }}</strong></a>
+  <a class="overview-item {% if stato == 'da_rivedere' %}is-active{% endif %}" href="{% url 'archivio:lista' %}?stato=da_rivedere"><span>Da rivedere</span><strong>{{ conteggi.da_rivedere|default:0 }}</strong></a>
+  <a class="overview-item {% if stato == 'approvato' %}is-active{% endif %}" href="{% url 'archivio:lista' %}?stato=approvato"><span>Approvate</span><strong>{{ conteggi.approvati|default:0 }}</strong></a>
+  <a class="overview-item {% if stato == 'programmato' %}is-active{% endif %}" href="{% url 'archivio:lista' %}?stato=programmato"><span>Programmate</span><strong>{{ conteggi.programmati|default:0 }}</strong></a>
+</div>
+<form class="filter-bar" method="get" action="{% url 'archivio:lista' %}" role="search">
+  <label class="search-field"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span class="visually-hidden">Cerca una produzione</span><input type="search" name="q" value="{{ q }}" placeholder="Cerca per titolo o copione…"></label>
+  <label class="visually-hidden" for="origine">Origine</label><select id="origine" name="origine" data-submit-on-change><option value="">Tutte le origini</option><option value="kaapi" {% if origine == 'kaapi' %}selected{% endif %}>Kaapi</option><option value="factory" {% if origine == 'factory' %}selected{% endif %}>Factory</option><option value="altro" {% if origine == 'altro' %}selected{% endif %}>Altra origine</option></select>
+  <label class="visually-hidden" for="stato">Stato</label><select id="stato" name="stato" data-submit-on-change><option value="">Tutti gli stati</option><option value="da_rivedere" {% if stato == 'da_rivedere' %}selected{% endif %}>Da rivedere</option><option value="approvato" {% if stato == 'approvato' %}selected{% endif %}>Approvate</option><option value="programmato" {% if stato == 'programmato' %}selected{% endif %}>Programmate</option></select>
+  <button class="btn btn-small" type="submit">Cerca</button>
+  {% if q or origine or stato %}<a class="btn btn-quiet btn-small" href="{% url 'archivio:lista' %}">Azzera filtri</a>{% endif %}
+</form>
+<div class="list-meta"><span><strong>{{ produzioni|length }}</strong> produzion{% if produzioni|length == 1 %}e{% else %}i{% endif %}{% if q or origine or stato %} trovat{% if produzioni|length == 1 %}a{% else %}e{% endif %}{% endif %}</span><div class="view-switch" aria-label="Visualizzazione"><button type="button" data-layout="grid" aria-label="Mostra schede" aria-pressed="true" class="is-active"><svg class="icon"><use href="#i-grid"/></svg></button><button type="button" data-layout="list" aria-label="Mostra elenco" aria-pressed="false"><svg class="icon"><use href="#i-list"/></svg></button></div></div>
+{% if produzioni %}
+<div class="production-grid" data-productions>
+  {% for produzione in produzioni %}
+  <article class="production-card">
+    <a class="card-preview" href="{% url 'archivio:dettaglio' produzione.id %}" aria-label="Apri {{ produzione.titolo }}"><span class="preview-mark"><svg class="icon" aria-hidden="true"><use href="#i-film"/></svg></span><span class="preview-label">{{ produzione.origine_label }}</span>{% if produzione.ultima_revisione %}<span class="card-version">Revisione {{ produzione.ultima_revisione.numero|stringformat:'02d' }}</span>{% endif %}</a>
+    <div class="card-body"><h2 class="card-title"><a href="{% url 'archivio:dettaglio' produzione.id %}">{{ produzione.titolo }}</a></h2><span class="card-origin">{{ produzione.origine_label }}</span><p class="card-description">{{ produzione.descrizione_preview|default:'Apri la produzione per rivedere il video e le sue revisioni.' }}</p>{% include 'archivio/_badge.html' with stato=produzione.stato label=produzione.stato_label only %}</div>
+    <div class="card-footer"><span class="card-date"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>{% if produzione.ultima_revisione %}{{ produzione.ultima_revisione.creata_il|date:'d M Y' }}{% else %}Nessuna revisione{% endif %}</span><span class="card-date">{{ produzione.numero_revisioni }} revision{% if produzione.numero_revisioni == 1 %}e{% else %}i{% endif %}</span><a href="{% url 'archivio:dettaglio' produzione.id %}" aria-label="Apri {{ produzione.titolo }}"><svg class="icon card-arrow"><use href="#i-arrow"/></svg></a></div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state"><div class="empty-mark"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg></div>{% if q or origine or stato %}<h2>Nessuna produzione trovata.</h2><p>Prova un altro titolo oppure allarga i filtri di ricerca.</p><a class="btn" href="{% url 'archivio:lista' %}">Mostra tutto l’archivio</a>{% else %}<h2>Il prossimo video parte da qui.</h2><p>Deposita la prima produzione per conservarla, rivederla e prepararne le prossime revisioni.</p>{% if puo_creare %}<a class="btn btn-primary" href="{% url 'archivio:nuova' %}"><svg class="icon"><use href="#i-upload"/></svg>Carica la prima produzione</a>{% else %}<a class="btn" href="{% url 'archivio:guida' %}">Scopri come funziona</a>{% endif %}{% endif %}</div>
+{% endif %}
+{% endblock %}
