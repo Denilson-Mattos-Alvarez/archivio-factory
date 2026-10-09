@@ -24,9 +24,6 @@ jobs:
         sistema: [ubuntu-latest, windows-latest]
     env:
       ARCHIVIO_AMBIENTE: sviluppo
-      ARCHIVIO_RUNTIME_ROOT: ${{ runner.temp }}/archivio-collaudo
-      ARCHIVIO_MEDIA_ROOT: ${{ runner.temp }}/archivio-collaudo/media
-      ARCHIVIO_TEST_TMP: ${{ runner.temp }}
       DATABASE_URL: ""
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       PYTHONUTF8: "1"
@@ -41,6 +38,17 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
+      - name: Prepara le directory temporanee del collaudo
+        shell: python
+        run: |
+          import os
+          runtime = os.path.join(os.environ["RUNNER_TEMP"], "archivio-collaudo")
+          media = os.path.join(runtime, "media")
+          os.makedirs(media, exist_ok=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as output:
+              output.write(f"ARCHIVIO_RUNTIME_ROOT={runtime}\n")
+              output.write(f"ARCHIVIO_MEDIA_ROOT={media}\n")
+              output.write(f"ARCHIVIO_TEST_TMP={os.environ['RUNNER_TEMP']}\n")
       - name: Installa le dipendenze runtime verificate
         run: >-
           python -m pip install --require-hashes --only-binary=:all: -r requirements-lock.txt
@@ -77,9 +85,6 @@ jobs:
       ARCHIVIO_CI_ADMIN_PASSWORD: archivio-ci-admin-fittizio
       ARCHIVIO_CI_APP_PASSWORD: archivio-ci-app-fittizio
       ARCHIVIO_SCHEMA: archivio_factory
-      ARCHIVIO_RUNTIME_ROOT: ${{ runner.temp }}/archivio-postgres-collaudo
-      ARCHIVIO_MEDIA_ROOT: ${{ runner.temp }}/archivio-postgres-collaudo/media
-      ARCHIVIO_TEST_TMP: ${{ runner.temp }}
       DATABASE_URL: postgresql://archivio_app:archivio-ci-app-fittizio@localhost:5432/archivio_ci?sslmode=disable
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       PYTHONUTF8: "1"
@@ -92,6 +97,17 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
+      - name: Prepara le directory temporanee del collaudo PostgreSQL
+        shell: python
+        run: |
+          import os
+          runtime = os.path.join(os.environ["RUNNER_TEMP"], "archivio-postgres-collaudo")
+          media = os.path.join(runtime, "media")
+          os.makedirs(media, exist_ok=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as output:
+              output.write(f"ARCHIVIO_RUNTIME_ROOT={runtime}\n")
+              output.write(f"ARCHIVIO_MEDIA_ROOT={media}\n")
+              output.write(f"ARCHIVIO_TEST_TMP={os.environ['RUNNER_TEMP']}\n")
       - name: Installa le dipendenze runtime verificate
         run: >-
           python -m pip install --require-hashes --only-binary=:all: -r requirements-lock.txt
