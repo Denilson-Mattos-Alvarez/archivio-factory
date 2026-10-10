@@ -104,7 +104,7 @@ def nuova(request, produzione_id=None):
             with transaction.atomic():
                 if produzione is None:
                     produzione = services.crea_produzione(request.user, spazio_id=request.POST.get('spazio_id'),
-                        titolo=request.POST.get('titolo'), origine=request.POST.get('origine', 'factory'),
+                        titolo=request.POST.get('titolo'), origine=request.POST.get('origine', 'altro'),
                         riferimento_factory=request.POST.get('riferimento_factory', ''))
                 revisione = services.crea_revisione(request.user, produzione_id=produzione.id,
                     video=request.FILES.get('video'), copione=request.POST.get('copione', ''),
@@ -145,7 +145,7 @@ def nota(request, revisione_id):
 @require_POST
 def modifica(request, revisione_id):
     return _esegui(request, revisione_id, services.richiedi_modifica,
-        'Richiesta salvata. La Factory la acquisirà quando il connettore sarà avviato.',
+        'Richiesta salvata con i materiali di questa versione.',
         testo=request.POST.get('testo'), target=request.POST.get('target'))
 
 

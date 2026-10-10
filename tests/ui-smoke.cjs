@@ -6,7 +6,9 @@ const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
 
 const root = path.resolve(__dirname, "..");
-const demo = JSON.parse(fs.readFileSync(path.join(root, "runtime", "accesso-demo.json"), "utf8"));
+const credentialsFile = path.resolve(root, process.env.ARCHIVIO_UI_DEMO_CREDENTIALS || path.join("runtime", "accesso-demo.json"));
+const demo = JSON.parse(fs.readFileSync(credentialsFile, "utf8"));
+const historyQuery = process.env.ARCHIVIO_UI_HISTORY_QUERY || "Conserviamo il copione";
 const base = "http://127.0.0.1:58540";
 assert.equal(demo.url, base, "Use only the authorized local demo.");
 assert.equal(demo.solo_dimostrazione, true, "Real archives are excluded.");
@@ -63,14 +65,17 @@ async function visit(page, pathname) {
   assert.equal(await page.locator(".production-card").count(), 3);
   const origins = await page.locator("#origine option").evaluateAll((items) => items.map((item) => item.value));
   assert.deepEqual(origins, ["", "kaapi", "factory", "altro"]);
+  const originLabels = await page.locator("#origine option").allTextContents();
+  assert.deepEqual(originLabels, ["Tutte le origini", "Integrazione esterna", "Generatore video", "Caricamento diretto"]);
+  assert((await page.locator(".page-description").innerText()).includes("prima della pubblicazione sui social"));
   pass("login and archive", { productions: 3, originOptions: origins });
   await shot(page, "desktop-archivio.png");
   await layout(page, "desktop archive");
   await Promise.all([page.waitForURL(/origine=kaapi/), page.locator("#origine").selectOption("kaapi")]);
   assert.equal(await page.locator(".production-card").count(), 1);
   pass("origin filter", { productions: 1 });
-  await page.locator('input[name="q"]').fill("la prima versione");
-  await Promise.all([page.waitForURL(/q=la/), page.getByRole("button", { name: "Cerca", exact: true }).click()]);
+  await page.locator('input[name="q"]').fill(historyQuery);
+  await Promise.all([page.waitForURL((url) => url.searchParams.get("q") === historyQuery), page.getByRole("button", { name: "Cerca", exact: true }).click()]);
   assert.equal(await page.locator(".production-card").count(), 1);
   pass("search in historical script", { productions: 1 });
   await page.getByRole("button", { name: "Mostra elenco" }).click();
@@ -104,7 +109,7 @@ async function visit(page, pathname) {
   assert(await page.locator("#note").isVisible());
   assert.equal(await page.locator("#modifica-target option").count(), 4);
   await shot(page, "desktop-note-richieste.png");
-  pass("notes tab and Factory request form");
+  pass("notes tab and modification request form");
   await visit(page, "/calendario/");
   assert.equal(await page.locator(".event").count(), 1);
   assert.equal(await page.getByRole("button", { name: "Segna come pubblicato" }).count(), 1);
@@ -119,6 +124,8 @@ async function visit(page, pathname) {
   await visit(page, "/guida/");
   await layout(page, "desktop guide");
   await visit(page, "/nuovo/");
+  assert.equal(await page.locator("#nuova-origine").inputValue(), "altro");
+  pass("manual deposit defaults to direct upload");
   assert.equal(await page.locator('input[name="video"]').getAttribute("accept"), "video/mp4,.mp4");
   assert.equal(await page.locator('form[enctype="multipart/form-data"] input[name="csrfmiddlewaretoken"]').count(), 1);
   await shot(page, "desktop-deposito.png");
@@ -168,7 +175,7 @@ async function visit(page, pathname) {
   const smallFilterWidths = await page.locator(".filter-bar select").evaluateAll((items) => items.map((item) => Math.round(item.getBoundingClientRect().width)));
   assert(smallFilterWidths.every((width) => width >= 110));
   pass("small mobile filter labels", { widths: smallFilterWidths });
-  // No demo approval, publication record, upload or external Factory is modified.
+  // No demo approval, publication record, upload or external generator is modified.
   await browser.close();
   browser = null;
   assert.equal(report.errors.length, 0, "Browser console errors");

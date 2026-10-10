@@ -56,21 +56,21 @@ class Command(BaseCommand):
                     files_created.extend(services.percorso_file(file) for file in item.file.all())
                     return item
 
-                kaapi = services.crea_produzione(user, spazio_id=space.id, titolo='Kaapi: un posto per ogni versione', origine='kaapi', riferimento_factory='demo-kaapi-001')
+                kaapi = services.crea_produzione(user, spazio_id=space.id, titolo='Una storia da raccontare', origine='kaapi', riferimento_factory='demo-episodio-001')
                 first = revision(kaapi, 0, 'Ogni video racconta un passaggio del nostro lavoro. Conserviamo il copione, i materiali e la prima versione per poterli rivedere.', 'Prima idea del video. Esempio sintetico.')
                 services.approva_revisione(user, revisione_id=first.id)
                 second = revision(kaapi, 1, 'Ogni versione merita il suo posto. Quando cambiamo un video, conserviamo quello precedente e rileggiamo il copione insieme al nuovo montaggio.', 'Nuovo copione e nuovo montaggio: questa versione riparte da rivedere.')
                 services.aggiungi_nota(user, revisione_id=second.id, testo='Accorciare l’introduzione e lasciare più spazio al messaggio finale.', timecode_seconds=1.5)
                 services.richiedi_modifica(user, revisione_id=second.id, testo='Rivedere il ritmo dell’introduzione mantenendo la versione precedente.', target='montaggio')
 
-                factory = services.crea_produzione(user, spazio_id=space.id, titolo='Una guida per conservare i video', origine='factory', riferimento_factory='demo-factory-001')
-                approved = revision(factory, 0, 'Il lavoro della Factory arriva qui con video e copione. Scegliamo la versione da approvare e decidiamo quando farla uscire.', 'Versione approvata, pronta per il calendario.')
+                factory = services.crea_produzione(user, spazio_id=space.id, titolo='La guida del prossimo episodio', origine='factory', riferimento_factory='demo-episodio-002')
+                approved = revision(factory, 0, 'Il video e il copione sono pronti per una revisione. Rileggiamo il testo, controlliamo il montaggio e scegliamo quando pubblicare questa versione sui social.', 'Versione approvata, pronta per il calendario.')
                 services.approva_revisione(user, revisione_id=approved.id)
                 future = timezone.localtime(timezone.now()).replace(hour=16, minute=30, second=0, microsecond=0) + timedelta(days=4)
                 services.programma_revisione(user, revisione_id=approved.id, piattaforma='YouTube', prevista_il=future)
 
                 other = services.crea_produzione(user, spazio_id=space.id, titolo='Appunti per la prossima uscita', origine='altro', riferimento_factory='demo-altro-001')
-                ready = revision(other, 1, 'Un archivio comune può raccogliere anche altri video. Il percorso rimane lo stesso: conservare, rivedere, approvare e programmare.', 'Esempio di un video proveniente da un altro progetto.')
+                ready = revision(other, 1, 'Prepariamo la prossima uscita: raccogliamo video, copione e materiali, confrontiamo le versioni e annotiamo le ultime modifiche prima della pubblicazione.', 'Materiale dimostrativo caricato per la prossima uscita.')
                 services.approva_revisione(user, revisione_id=ready.id)
         except Exception:
             # Soltanto file nuovi di questa demo; i dati preesistenti non sono toccati.

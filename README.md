@@ -1,6 +1,8 @@
 # Archivio Factory
 
-Un archivio privato per i video di Kaapi, della Factory e di altre origini. Conserva video, copione e allegati di ogni versione; permette di rivederli, annotarli, richiedere modifiche e scegliere una data di uscita dopo l'approvazione umana.
+Uno spazio privato dove depositare i propri video, copioni e materiali prima della pubblicazione sui social. Permette di rivederli, conservare le versioni, raccogliere note e scegliere quando far uscire la versione approvata.
+
+Ogni persona o gruppo può installarlo per gestire il proprio archivio. Il repository GitHub ospita il codice open source; i video, i copioni e i dati dell'installazione restano nello spazio privato scelto da chi lo utilizza.
 
 Il codice di questo progetto è originale e distribuito con [licenza MIT](LICENSE): è gratuito da usare, modificare e distribuire, anche commercialmente, conservando l'avviso di licenza. Server, spazio disco e servizi esterni eventualmente collegati hanno i propri costi. Le dipendenze conservano le rispettive licenze. Il progetto non incorpora codice di MediaCMS o Reloops.
 
@@ -11,14 +13,14 @@ Anteprima con soli dati sintetici. [Rapporto di collaudo](docs/COLLAUDO.md) · [
 ## Cosa funziona
 
 - Spazi privati con accessi da lettore e revisore.
-- Produzioni distinte per origine e riferimento Factory; revisioni numerate con video, copione, nota e allegati.
+- Produzioni organizzate per origine e riferimento esterno; revisioni numerate con video, copione, nota e allegati.
 - Video e allegati immutabili nell'applicazione, con SHA-256 e controllo di integrità prima dello scaricamento.
 - Approvazione legata alla revisione esatta: una nuova versione richiede una nuova approvazione.
 - Note anche con indicazione del secondo del video; richieste su copione, montaggio, voce e sottotitoli.
 - Calendario editoriale delle revisioni approvate e registrazione manuale dell'avvenuta pubblicazione.
 - API private, ponte Python, pacchetti di revisione e backup SQLite con ripristino verificato in una cartella nuova.
 
-La richiesta di modifica entra in coda. Il ponte la esporta con i file storici; la Factory deve poi lavorarla tramite un dispatcher configurato. L'archivio non genera video e non pubblica autonomamente sui social. La semplice presenza di un calendario non avvia un caricamento su YouTube, TikTok o altre piattaforme. [Collegamento e limiti della Factory](docs/FACTORY.md).
+Si può usare direttamente dal browser per caricare video e copioni, rivedere il lavoro e preparare le uscite. Non richiede uno specifico generatore video. Se si collega un processo esterno, il ponte può esportare le richieste di modifica insieme ai materiali della versione scelta: quel processo deve poi eseguirle. Il calendario registra le uscite previste; la pubblicazione sui social va effettuata sul relativo servizio. [Integrazione facoltativa con la Factory](docs/FACTORY.md).
 
 ## Avvio locale su Windows
 
@@ -58,7 +60,7 @@ Per una prova con materiale sintetico, usare `manage.py inizializza_demo [--user
 
 Per poter rifare un montaggio, depositare anche il materiale necessario: progetto o timeline, immagini, audio, sottotitoli e metadati. Il solo MP4 finale non ricostruisce un progetto di montaggio o le impostazioni del generatore. I file ricevuti vengono conservati come dati e non eseguiti.
 
-## Collegare la Factory
+## Integrazione facoltativa con la Factory
 
 Creare una chiave limitata allo spazio:
 
@@ -69,7 +71,7 @@ Creare una chiave limitata allo spazio:
 Il token viene mostrato una sola volta: conservarlo in un gestore di segreti. Caricarlo nell'ambiente del processo che usa il ponte, sotto `ARCHIVIO_FACTORY_API_KEY`; non inserirlo in comandi salvati, JSON di workflow o Git. Un esempio senza credenziali:
 
 ```powershell
-.\.venv\Scripts\python.exe client_factory.py deposita --titolo "Video di prova" --origine kaapi --riferimento-factory "kaapi:episodio-001" --video "C:\Video\video.mp4" --copione "C:\Video\copione.txt" --allegato "C:\Video\episode.it.json"
+.\.venv\Scripts\python.exe client_factory.py deposita --titolo "Video di prova" --origine altro --riferimento-factory "episodio-001" --video "C:\Video\video.mp4" --copione "C:\Video\copione.txt" --allegato "C:\Video\sottotitoli.srt"
 ```
 
 Lo stesso riferimento identifica la stessa produzione; ripetere un deposito identico restituisce la stessa revisione. Cambiare video, copione, nota o allegati crea una nuova versione. Gli esempi completi e l'API sono in [docs/FACTORY.md](docs/FACTORY.md) e [examples](examples/README.md).

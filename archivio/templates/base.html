@@ -40,7 +40,7 @@
   <div class="sidebar-scrim" data-sidebar-scrim hidden></div>
   <aside class="sidebar" id="navigazione" data-sidebar>
     <a class="brand" href="{% url 'archivio:lista' %}"><span class="brand-mark">A</span><span class="brand-name">Archivio<span>Factory</span></span></a>
-    <p class="sidebar-intro">Uno spazio per conservare,<br>rivedere e preparare le uscite.</p>
+    <p class="sidebar-intro">Uno spazio per depositare,<br>rivedere e preparare le uscite.</p>
     <p class="nav-label">Il tuo spazio</p>
     <nav class="nav-links" aria-label="Navigazione principale">
       <a class="nav-link {% if request.resolver_match.url_name == 'lista' or request.resolver_match.url_name == 'dettaglio' or request.resolver_match.url_name == 'nuova' or request.resolver_match.url_name == 'nuova_revisione' %}is-active{% endif %}" href="{% url 'archivio:lista' %}"><svg class="icon"><use href="#i-grid"/></svg>Archivio</a>
@@ -59,11 +59,11 @@
   {% endif %}
   <main id="contenuto" class="{% if request.user.is_authenticated %}app-main{% else %}auth-main{% endif %}">
     {% if request.user.is_authenticated %}
-    <div class="topbar"><div class="topbar-path"><span>Factory</span><svg class="icon"><use href="#i-chevron"/></svg><strong>{% block breadcrumb %}Archivio{% endblock %}</strong></div><span class="topbar-tag">Produzioni e revisioni</span></div>
+    <div class="topbar"><div class="topbar-path"><span>Spazio</span><svg class="icon"><use href="#i-chevron"/></svg><strong>{% block breadcrumb %}Archivio{% endblock %}</strong></div><span class="topbar-tag">Produzioni e revisioni</span></div>
     {% endif %}
     {% if messages %}<div class="messages" role="status">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
     {% block content %}{% endblock %}
-    {% if request.user.is_authenticated %}<footer class="site-footer"><span>Archivio Factory · Il lavoro di oggi, le versioni di domani.</span><a href="{% url 'archivio:guida' %}">Come funziona l’archivio</a></footer>{% endif %}
+    {% if request.user.is_authenticated %}<footer class="site-footer"><span>Archivio Factory · Il tuo spazio prima della pubblicazione.</span><a href="{% url 'archivio:guida' %}">Come funziona l’archivio</a></footer>{% endif %}
   </main>
 </body>
 </html>

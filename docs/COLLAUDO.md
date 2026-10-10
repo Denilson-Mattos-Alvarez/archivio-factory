@@ -8,7 +8,7 @@ Prima versione originale di Archivio Factory, licenza MIT, Python 3.12. Tutte le
 | Suite su PostgreSQL 16 isolato | 65 test superati, nessun test saltato |
 | Concorrenza PostgreSQL | 8 depositi paralleli conservano 8 revisioni; 8 retry identici creano una sola revisione e un solo video |
 | Privilegi PostgreSQL | `anon` e `authenticated` non possono usare lo schema privato o leggere le produzioni |
-| Browser Edge, desktop e telefono | 27 controlli superati, nessun errore console o overflow a 1366, 390 e 320 pixel |
+| Browser Edge, desktop e telefono | 28 controlli superati sull'interfaccia generale, nessun errore console o overflow a 1366, 390 e 320 pixel |
 | Ponte HTTP verso l'app locale | 8 controlli superati, inclusi deposito multipart, retry, richiesta storica, consegna, blocco delle approvazioni Factory e revoca |
 | Recupero dell'archivio SQLite reale di prova | 22 controlli superati: 4 produzioni, 6 revisioni, 8 file e tutte le 54 righe delle 11 tabelle dell'archivio conservate |
 | Accesso dopo il ripristino | Nuova istanza locale: login umano riuscito, video privato con byte e SHA-256 identici, accesso anonimo negato |
