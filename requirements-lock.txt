@@ -1,8 +1,9 @@
 # Versioni runtime collaudate; tutti gli hash provengono da PyPI via HTTPS.
 # Installazione: python -m pip install --require-hashes --only-binary=:all: -r requirements-lock.txt
 
-Django==5.2.18 \
-    --hash=sha256:92ed81d500be6408ecd704d7bd1366c534f30427bffcc63c5fefb129561aec7c
+Django==6.1.2 \
+    --hash=sha256:141efee6ec64d1db6db90683bf734c550102450f444fb099063b0be1bd27d991 \
+    --hash=sha256:a1e92451ccb8b514e91bbb3b6d186d20b4030558f116b5d9de6535455ff210b7
 
 djangorestframework==3.18.3 \
     --hash=sha256:8544bb674846731b1e3c9b309236ee1dc412905a0aa725be2ec193ca950a7d12
